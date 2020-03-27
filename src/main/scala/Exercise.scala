@@ -49,7 +49,7 @@ object Exercise extends App {
    * @param sc
    */
   def exercise1(sc: SparkContext): Unit = {
-    val rddWeather = sc.textFile("hdfs:/bigdata/dataset/weather-sample").map(WeatherData.extract)
+    val rddWeather = sc.textFile("hdfs:/user/cloudera/dataset/weather-sample").map(WeatherData.extract)
     val rddCached =  rddWeather.coalesce(4).filter(_.temperature<999).map(x => (x.month, x.temperature)).cache()
     // Average temperature for every month
     rddCached
@@ -71,7 +71,7 @@ object Exercise extends App {
     import org.apache.spark.HashPartitioner
     val p = new HashPartitioner(8)
 
-    val rddStation = sc.textFile("hdfs:/bigdata/dataset/weather-info/stations.csv").map(StationData.extract)
+    val rddStation = sc.textFile("hdfs:/user/cloudera/dataset/weather-info/stations.csv").map(StationData.extract)
 
     // val rddS1 = rddStation.partitionBy(p).keyBy(x => x.usaf + x.wban).cache()
     // val rddS2 = rddStation.partitionBy(p).cache().keyBy(x => x.usaf + x.wban)
@@ -100,8 +100,8 @@ object Exercise extends App {
    * @param sc
    */
   def exercise3(sc: SparkContext): Unit = {
-    val rddWeather = sc.textFile("hdfs:/bigdata/dataset/weather-sample").map(WeatherData.extract)
-    val rddStation = sc.textFile("hdfs:/bigdata/dataset/weather-info/stations.csv").map(StationData.extract)
+    val rddWeather = sc.textFile("hdfs:/user/cloudera/dataset/weather-sample").map(WeatherData.extract)
+    val rddStation = sc.textFile("hdfs:/user/cloudera/dataset/weather-info/stations.csv").map(StationData.extract)
 
     // TODO exercise
   }
@@ -112,7 +112,7 @@ object Exercise extends App {
    */
   def exercise4(sc: SparkContext): Unit = {
     import org.apache.spark.storage.StorageLevel._
-    val rddWeather = sc.textFile("hdfs:/bigdata/dataset/weather-sample").map(WeatherData.extract)
+    val rddWeather = sc.textFile("hdfs:/user/cloudera/dataset/weather-sample").map(WeatherData.extract)
 
     sc.getPersistentRDDs.foreach(_._2.unpersist())
 
@@ -140,8 +140,8 @@ object Exercise extends App {
   def exercise5(sc: SparkContext): Unit = {
     import org.apache.spark.HashPartitioner
 
-    val rddWeather = sc.textFile("hdfs:/bigdata/dataset/weather-sample").map(WeatherData.extract)
-    val rddStation = sc.textFile("hdfs:/bigdata/dataset/weather-info/stations.csv").map(StationData.extract)
+    val rddWeather = sc.textFile("hdfs:/user/cloudera/dataset/weather-sample").map(WeatherData.extract)
+    val rddStation = sc.textFile("hdfs:/user/cloudera/dataset/weather-info/stations.csv").map(StationData.extract)
 
     val rddW = rddWeather
       .sample(false,0.1)
