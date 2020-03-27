@@ -75,7 +75,7 @@ object Exercise extends App {
 
     // val rddS1 = rddStation.partitionBy(p).keyBy(x => x.usaf + x.wban).cache()
     // val rddS2 = rddStation.partitionBy(p).cache().keyBy(x => x.usaf + x.wban)
-    // val rddS3 = rddStation.keyBy(x => x.usaf + x.wban).partitionBy(p).cache()
+    val rddS3 = rddStation.keyBy(x => x.usaf + x.wban).partitionBy(p).cache()
     // val rddS4 = rddStation.keyBy(x => x.usaf + x.wban).cache().partitionBy(p)
 
   }
@@ -103,7 +103,19 @@ object Exercise extends App {
     val rddWeather = sc.textFile("hdfs:/user/cloudera/dataset/weather-sample").map(WeatherData.extract)
     val rddStation = sc.textFile("hdfs:/user/cloudera/dataset/weather-info/stations.csv").map(StationData.extract)
 
-    // TODO exercise
+    val p = new HashPartitioner(8)
+    val rddW = rddWeather
+      .filter(_.temperature<999)
+      .keyBy(x => x.usaf + x.wban)
+      .partitionBy(p)
+    val rddS = rddStation
+      .keyBy(x => x.usaf + x.wban)
+      .partitionBy(p)
+    val rddJoin = rddS.join(rddW)
+    val cachedRdd = rddJoin.cache()
+    
+    cachedRdd.map({case(k,v)=>(v._1.name, v._2.temperature)}).reduceByKey((x,y)=>{if(x<y) y else x}).collect()
+    cachedRdd.filter(_._2._1.country == "IT").map({case(k,v)=>(v._1.name, v._2.temperature)}).reduceByKey((x,y)=>{if(x<y) y else x}).collect()
   }
 
   /**
