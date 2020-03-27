@@ -50,19 +50,15 @@ object Exercise extends App {
    */
   def exercise1(sc: SparkContext): Unit = {
     val rddWeather = sc.textFile("hdfs:/bigdata/dataset/weather-sample").map(WeatherData.extract)
-
+    val rddCached =  rddWeather.coalesce(4).filter(_.temperature<999).map(x => (x.month, x.temperature)).cache()
     // Average temperature for every month
-    rddWeather
-      .filter(_.temperature<999)
-      .map(x => (x.month, x.temperature))
+    rddCached
       .aggregateByKey((0.0,0.0))((a,v)=>(a._1+v,a._2+1),(a1,a2)=>(a1._1+a2._1,a1._2+a2._2))
       .map({case(k,v)=>(k,v._1/v._2)})
       .collect()
 
     // Maximum temperature for every month
-    rddWeather
-      .filter(_.temperature<999)
-      .map(x => (x.month, x.temperature))
+    rddCached
       .reduceByKey((x,y)=>{if(x<y) y else x})
       .collect()
   }
