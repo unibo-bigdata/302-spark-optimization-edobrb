@@ -115,7 +115,7 @@ object Exercise extends App {
     val cachedRdd = rddJoin.cache()
     
     cachedRdd.map({case(k,v)=>(v._1.name, v._2.temperature)}).reduceByKey((x,y)=>{if(x<y) y else x}).collect()
-    cachedRdd.filter(_._2._1.country == "IT").map({case(k,v)=>(v._1.name, v._2.temperature)}).reduceByKey((x,y)=>{if(x<y) y else x}).collect()
+    cachedRdd.filter(_._2._1.country == "IT").map({case(k,v)=>(v._1.name, v._2.temperature)}).reduceByKey((x,y)=>{if(x<y) y else x}).map({case(k,v) => (v,k)}).sortByKey(false).collect()
   }
 
   /**
