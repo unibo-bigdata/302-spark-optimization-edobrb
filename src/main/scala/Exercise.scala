@@ -186,7 +186,7 @@ object Exercise extends App {
       .reduceByKey((x,y)=>{if(x<y) y else x})
       .collect()
 
-    // ..or to exploit broadcast variables?
+    // ..or to exploit broadcast variables?  <--- this is better
     val bRddS = sc.broadcast(rddS.collectAsMap())
     val rddJ = rddW
       .map({case (k,v) => (bRddS.value.get(k),v)})
